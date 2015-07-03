@@ -114,7 +114,7 @@ fn compare_decoded_stream(fname: &path::Path) {
 
     // If the reference file does exist after decoding, we can compare it to
     // how Claxon decodes it, sample by sample.
-    if file_exists(&ref_fname) {
+    if file_exists(ref_fname) {
         let mut ref_stream = hound::WavReader::open(ref_fname).unwrap();
 
         let try_file = fs::File::open(fname).unwrap();
