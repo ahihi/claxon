@@ -13,14 +13,21 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#![feature(path_ext)]
-
 extern crate claxon;
 extern crate hound;
 
 use std::fs;
+use std::fs::File;
 use std::io;
 use std::path;
+use std::path::Path;
+
+fn file_exists(path: &Path) -> bool {
+    match File::open(path) {
+        Ok(_)  => true,
+        Err(_) => false
+    }
+}
 
 fn run_metaflac(fname: &path::Path) -> String {
     use std::process::Command;
@@ -95,10 +102,8 @@ fn compare_metaflac(fname: &path::Path) {
 }
 
 fn compare_decoded_stream(fname: &path::Path) {
-    use std::fs::PathExt;
-
-    let ref_fname = fname.with_extension("wav");
-    if !ref_fname.exists() {
+    let ref_fname: &Path = &*fname.with_extension("wav");
+    if file_exists(ref_fname) {
         // TODO: actually, we might only want to run the test for files that
         // do exist already. It is fine to run streaminfo or decode-only tests
         // on thousands of files, but decoding thousands of files to wav before
@@ -109,7 +114,7 @@ fn compare_decoded_stream(fname: &path::Path) {
 
     // If the reference file does exist after decoding, we can compare it to
     // how Claxon decodes it, sample by sample.
-    if ref_fname.exists() {
+    if file_exists(&ref_fname) {
         let mut ref_stream = hound::WavReader::open(ref_fname).unwrap();
 
         let try_file = fs::File::open(fname).unwrap();
@@ -152,18 +157,17 @@ fn compare_decoded_stream(fname: &path::Path) {
 
 fn for_each_test_sample<F: Fn(&path::Path)>(f: F) {
     use std::ffi::OsStr;
-    use std::fs::PathExt;
 
     // Enumerate all the flac files in the testsamples directory, and execute
     // the function `f` for it.
     let dir = fs::read_dir("testsamples")
                  .ok().expect("failed to enumerate flac files");
     for path in dir {
-        let path = path.ok().expect("failed to obtain path info").path();
-        if path.is_file() && path.extension() == Some(OsStr::new("flac")) {
+        let path = &*path.ok().expect("failed to obtain path info").path();
+        if file_exists(path) && path.extension() == Some(OsStr::new("flac")) {
             print!("    comparing {} ...", path.to_str()
                                                .expect("unsupported filename"));
-            f(&path);
+            f(path);
             println!(" ok");
         }
     }

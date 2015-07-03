@@ -23,7 +23,6 @@
 use std::cmp::Eq;
 use std::fmt::Debug;
 use std::ops::{Add, BitAnd, BitOr, Mul, Neg, Shl, Shr, Sub};
-use std::num::{One, Zero};
 
 /// A trait that allows decoding into integers of various widths.
 ///
@@ -34,7 +33,7 @@ use std::num::{One, Zero};
 ///   Therefore, converting a sample to `i32` or `i64` can never fail.
 ///
 /// This trait should only be implemented for `i8`, `i16` and `i32`.
-pub trait Sample: Copy + Clone + Debug + Eq + Zero {
+pub trait Sample: Copy + Clone + Debug + Eq + ::Zero {
 
     /// The signed integer type that is wide enough to store differences.
     ///
@@ -57,7 +56,7 @@ pub trait Sample: Copy + Clone + Debug + Eq + Zero {
 /// could use `i64` everywhere and it will be wide enough, but this trait
 /// enables using the narrowest integer type that is wide enough, saving memory.
 pub trait WideSample: Copy + Clone + Debug + Eq +
-    Zero + One +
+    ::Zero + ::One +
     Neg<Output = Self> +
     Add<Output = Self> +
     Sub<Output = Self> +

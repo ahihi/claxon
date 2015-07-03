@@ -19,6 +19,8 @@ use error::{Error, FlacResult};
 use input::Bitstream;
 use sample;
 
+use ::Zero;
+
 #[derive(Clone, Copy, Debug)]
 enum SubframeType {
     Constant,
@@ -449,7 +451,8 @@ fn predict_fixed<Sample: sample::WideSample>
                                      .map(|&c| Sample::from_i8(c))
                                      .zip(window.iter())
                                      .map(|(c, &s)| c * s)
-                                     .sum::<Sample>();
+                                     .fold(Sample::zero(), |x, y| x+y);
+        
 
         // The delta is stored, so the sample is the prediction + delta.
         let delta = window[coefficients.len()];
@@ -526,7 +529,7 @@ fn predict_lpc<Sample: sample::WideSample>
         // predict based on the first #coefficients samples.
         let prediction = coefficients.iter().zip(window.iter())
                                      .map(|(&c, &s)| c as i64 * s.to_i64())
-                                     .sum::<i64>() >> qlp_shift;
+                                     .fold(0i64, |x, y| x+y) >> qlp_shift;
 
         // The result should fit in the `Sample` type again, even with one bit
         // unused. This ensures that adding the delta does not overflow, if

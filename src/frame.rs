@@ -23,6 +23,8 @@ use input::{Bitstream, ReadExt};
 use sample;
 use subframe;
 
+use ::Zero;
+
 #[derive(Clone, Copy)]
 enum BlockingStrategy {
     Fixed,
@@ -482,8 +484,6 @@ impl<'r, Sample: sample::Sample> FrameReader<'r, Sample> {
     }
 
     fn ensure_wide_buffer_len(&mut self, new_len: usize) {
-        use std::num::Zero;
-
         if self.wide_buffer.len() < new_len {
             // Previous data will be overwritten, so instead of resizing the
             // vector if it is too small, we might as well allocate a new one.

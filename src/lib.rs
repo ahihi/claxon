@@ -19,7 +19,6 @@
 
 #![warn(missing_docs)]
 #![allow(dead_code)] // TODO: Remove for v0.2
-#![feature(core, zero_one)]
 
 use std::io;
 use error::{Error, FlacResult};
@@ -34,6 +33,26 @@ pub mod frame;
 pub mod sample;
 pub mod subframe;
 pub mod metadata;
+
+#[allow(missing_docs)]
+pub trait Zero {
+    fn zero() -> Self;
+}
+
+impl Zero for i8 { fn zero() -> i8 { 0i8 } }
+impl Zero for i16 { fn zero() -> i16 { 0i16 } }
+impl Zero for i32 { fn zero() -> i32 { 0i32 } }
+impl Zero for i64 { fn zero() -> i64 { 0i64 } }
+
+#[allow(missing_docs)]
+pub trait One {
+    fn one() -> Self;
+}
+
+impl One for i8 { fn one() -> i8 { 1i8 } }
+impl One for i16 { fn one() -> i16 { 1i16 } }
+impl One for i32 { fn one() -> i32 { 1i32 } }
+impl One for i64 { fn one() -> i64 { 1i64 } }
 
 /// A FLAC decoder that can decode the stream from the underlying reader.
 ///
